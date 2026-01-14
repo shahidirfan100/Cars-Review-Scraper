@@ -199,12 +199,21 @@ async function main() {
                     if (reviews.length > 0) {
                         await Dataset.pushData(reviews);
                         crawlerLog.info(`✓ Saved ${reviews.length} reviews | Total: ${saved}/${RESULTS_WANTED}`);
+                    } else {
+                        // No new reviews were added - all were duplicates
+                        crawlerLog.info(`⚠️ No new reviews on page ${pageNo} (all duplicates)`);
                     }
 
                     // CRITICAL: Check if we've reached the desired count BEFORE enqueueing next page
                     if (saved >= RESULTS_WANTED) {
                         crawlerLog.info(`🎯 Target reached! Collected ${saved} reviews`);
                         return; // Stop here, don't enqueue more pages
+                    }
+
+                    // CRITICAL: If no new reviews were added, all available reviews have been collected
+                    if (reviews.length === 0 && reviewContainers.length > 0) {
+                        crawlerLog.info(`✅ All available reviews collected (${saved} total). No more unique reviews found.`);
+                        return; // Stop pagination - no point in checking more pages
                     }
 
                     // Handle pagination only if we need more reviews
