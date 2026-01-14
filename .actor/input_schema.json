@@ -47,13 +47,11 @@
       "editor": "number"
     },
     "max_pages": {
-      "title": "Maximum number of pages",
+      "title": "Maximum number of pages (optional)",
       "type": "integer",
-      "description": "Safety cap on the number of review pages to visit. Each page typically contains 10-15 reviews.",
+      "description": "Safety cap on pages to visit. Leave empty for auto-calculation based on results_wanted (approximately 10 reviews per page). Only set this if you want to override the automatic limit.",
       "minimum": 1,
-      "editor": "number",
-      "default": 10,
-      "prefill": 10
+      "editor": "number"
     },
     "proxyConfiguration": {
       "title": "Proxy configuration",

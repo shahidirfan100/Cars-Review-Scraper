@@ -14,12 +14,17 @@ async function main() {
             model = '',
             year,
             results_wanted: RESULTS_WANTED_RAW = 20,
-            max_pages: MAX_PAGES_RAW = 10,
+            max_pages: MAX_PAGES_INPUT,
             proxyConfiguration,
         } = input;
 
         const RESULTS_WANTED = Number.isFinite(+RESULTS_WANTED_RAW) ? Math.max(1, +RESULTS_WANTED_RAW) : 20;
-        const MAX_PAGES = Number.isFinite(+MAX_PAGES_RAW) ? Math.max(1, +MAX_PAGES_RAW) : 10;
+
+        // Auto-calculate max_pages based on results_wanted (assume ~10 reviews per page, add buffer)
+        const AUTO_MAX_PAGES = Math.ceil(RESULTS_WANTED / 10) + 2; // +2 as safety buffer
+        const MAX_PAGES = MAX_PAGES_INPUT ? Math.max(1, +MAX_PAGES_INPUT) : AUTO_MAX_PAGES;
+
+        log.info(`Configuration: ${RESULTS_WANTED} reviews wanted, max ${MAX_PAGES} pages (auto-calculated: ${AUTO_MAX_PAGES})`);
 
         // Build Cars.com review URL
         const buildReviewUrl = (mk, mdl, yr, page = 1) => {
@@ -92,8 +97,8 @@ async function main() {
             return Object.keys(breakdown).length > 0 ? breakdown : null;
         };
 
-        // Helper function for random delay (stealth)
-        const randomDelay = (min = 500, max = 1500) => {
+        // Helper function for random delay (stealth) - optimized for speed
+        const randomDelay = (min = 300, max = 700) => {
             return new Promise(resolve => setTimeout(resolve, Math.random() * (max - min) + min));
         };
 
@@ -101,16 +106,16 @@ async function main() {
             proxyConfiguration: proxyConf,
             maxRequestRetries: 3,
             useSessionPool: true,
-            maxConcurrency: 3, // Reduced for stealth
-            requestHandlerTimeoutSecs: 90,
-            minConcurrency: 1,
-            maxRequestsPerMinute: 60, // Rate limiting for stealth
+            maxConcurrency: 8, // Optimized for speed while maintaining stealth
+            requestHandlerTimeoutSecs: 60,
+            minConcurrency: 2,
+            // Removed maxRequestsPerMinute for faster execution
             additionalMimeTypes: ['application/json'],
-            // Enhanced headers for stealth
+            // Lightweight stealth with minimal delay
             preNavigationHooks: [
                 async ({ request }, goToOptions) => {
-                    // Add random delay between requests for stealth
-                    await randomDelay(800, 2000);
+                    // Optimized delay for balance between speed and stealth
+                    await randomDelay(300, 700);
                 },
             ],
             async requestHandler({ request, $, log: crawlerLog }) {
@@ -196,8 +201,14 @@ async function main() {
                         crawlerLog.info(`✓ Saved ${reviews.length} reviews | Total: ${saved}/${RESULTS_WANTED}`);
                     }
 
-                    // Handle pagination
-                    if (saved < RESULTS_WANTED && pageNo < MAX_PAGES) {
+                    // CRITICAL: Check if we've reached the desired count BEFORE enqueueing next page
+                    if (saved >= RESULTS_WANTED) {
+                        crawlerLog.info(`🎯 Target reached! Collected ${saved} reviews`);
+                        return; // Stop here, don't enqueue more pages
+                    }
+
+                    // Handle pagination only if we need more reviews
+                    if (pageNo < MAX_PAGES) {
                         try {
                             // Check if there's a next page link
                             const nextPageLink = $('.sds-pagination__next').attr('href');
@@ -209,7 +220,7 @@ async function main() {
                                     url: nextUrl,
                                     userData: { pageNo: pageNo + 1 }
                                 }]);
-                                crawlerLog.info(`→ Enqueued page ${pageNo + 1}`);
+                                crawlerLog.info(`→ Enqueued page ${pageNo + 1} (need ${RESULTS_WANTED - saved} more)`);
                             } else if (reviewContainers.length >= 5) {
                                 // Only try building next URL if we got a reasonable number of reviews
                                 const baseUrl = request.url.split('?')[0];
@@ -220,7 +231,7 @@ async function main() {
                                     url: nextUrl,
                                     userData: { pageNo: nextPage }
                                 }]);
-                                crawlerLog.info(`→ Built URL for page ${nextPage}`);
+                                crawlerLog.info(`→ Built URL for page ${nextPage} (need ${RESULTS_WANTED - saved} more)`);
                             } else {
                                 crawlerLog.info(`No more pages available`);
                             }
@@ -228,7 +239,7 @@ async function main() {
                             crawlerLog.warning(`Pagination error: ${paginationError.message}`);
                         }
                     } else {
-                        crawlerLog.info(`Reached limit: ${saved} reviews collected`);
+                        crawlerLog.info(`Max pages (${MAX_PAGES}) reached | Collected ${saved} reviews`);
                     }
                 } catch (error) {
                     crawlerLog.error(`Error processing page ${pageNo}: ${error.message}`);
