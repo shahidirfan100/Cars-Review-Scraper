@@ -1,0 +1,7 @@
+{
+  "make": "toyota",
+  "model": "camry",
+  "year": 2023,
+  "results_wanted": 20,
+  "max_pages": 5
+}

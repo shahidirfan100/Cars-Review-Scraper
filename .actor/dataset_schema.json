@@ -1,0 +1,68 @@
+{
+  "actorSpecification": 1,
+  "fields": {},
+  "views": {
+    "overview": {
+      "title": "Overview",
+      "transformation": {
+        "fields": [
+          "title",
+          "rating",
+          "author",
+          "date",
+          "recommendation",
+          "review_body",
+          "car_make",
+          "car_model",
+          "car_year",
+          "url"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "title": {
+            "label": "Review Title",
+            "format": "text"
+          },
+          "rating": {
+            "label": "Rating",
+            "format": "text"
+          },
+          "author": {
+            "label": "Author",
+            "format": "text"
+          },
+          "date": {
+            "label": "Date",
+            "format": "text"
+          },
+          "recommendation": {
+            "label": "Recommendation",
+            "format": "text"
+          },
+          "review_body": {
+            "label": "Review",
+            "format": "text"
+          },
+          "car_make": {
+            "label": "Make",
+            "format": "text"
+          },
+          "car_model": {
+            "label": "Model",
+            "format": "text"
+          },
+          "car_year": {
+            "label": "Year",
+            "format": "text"
+          },
+          "url": {
+            "label": "URL",
+            "format": "link"
+          }
+        }
+      }
+    }
+  }
+}

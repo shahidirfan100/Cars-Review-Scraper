@@ -1,0 +1,73 @@
+{
+  "title": "Cars.com Review Scraper",
+  "description": "Extract consumer reviews for any car model from Cars.com. Provide either a direct review URL OR specify the car's make, model, and year. The scraper automatically handles pagination and extracts comprehensive review data including ratings, author information, and detailed feedback.",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "startUrl": {
+      "title": "Start URL",
+      "type": "string",
+      "description": "Direct Cars.com review URL (e.g., https://www.cars.com/research/toyota-camry-2023/consumer-reviews/). If provided, this will be used instead of make/model/year.",
+      "editor": "textfield",
+      "example": "https://www.cars.com/research/toyota-camry-2023/consumer-reviews/"
+    },
+    "make": {
+      "title": "Car Make",
+      "type": "string",
+      "description": "Car manufacturer (e.g., Toyota, Honda, Ford, Audi). Required if not using startUrl.",
+      "editor": "textfield",
+      "prefill": "toyota",
+      "example": "toyota"
+    },
+    "model": {
+      "title": "Car Model",
+      "type": "string",
+      "description": "Car model name (e.g., Camry, Civic, F-150, A3). Use underscores for multi-word models (e.g., 'a3_e_tron'). Required if not using startUrl.",
+      "editor": "textfield",
+      "prefill": "camry",
+      "example": "camry"
+    },
+    "year": {
+      "title": "Model Year",
+      "type": "integer",
+      "description": "Model year (e.g., 2023, 2022, 2024). Required if not using startUrl.",
+      "editor": "number",
+      "prefill": 2023,
+      "example": 2023,
+      "minimum": 1980,
+      "maximum": 2030
+    },
+    "results_wanted": {
+      "title": "Maximum number of reviews",
+      "type": "integer",
+      "description": "Maximum number of reviews to collect. Set a limit to control runtime and costs.",
+      "minimum": 1,
+      "default": 20,
+      "prefill": 20,
+      "editor": "number"
+    },
+    "max_pages": {
+      "title": "Maximum number of pages",
+      "type": "integer",
+      "description": "Safety cap on the number of review pages to visit. Each page typically contains 10-15 reviews.",
+      "minimum": 1,
+      "editor": "number",
+      "default": 10,
+      "prefill": 10
+    },
+    "proxyConfiguration": {
+      "title": "Proxy configuration",
+      "type": "object",
+      "description": "Proxy settings for requests. Residential proxies recommended for better reliability.",
+      "editor": "proxy",
+      "default": {
+        "useApifyProxy": true,
+        "apifyProxyGroups": [
+          "RESIDENTIAL"
+        ]
+      }
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}
