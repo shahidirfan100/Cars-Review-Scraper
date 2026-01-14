@@ -54,8 +54,7 @@ Provide a direct Cars.com review URL:
 ```json
 {
   "startUrl": "https://www.cars.com/research/toyota-camry-2023/consumer-reviews/",
-  "results_wanted": 50,
-  "max_pages": 10
+  "results_wanted": 50
 }
 ```
 
@@ -68,8 +67,7 @@ Specify vehicle details to automatically build the URL:
   "make": "honda",
   "model": "civic",
   "year": 2024,
-  "results_wanted": 100,
-  "max_pages": 15
+  "results_wanted": 100
 }
 ```
 
@@ -82,10 +80,9 @@ Specify vehicle details to automatically build the URL:
 | `model` | String | No* | Vehicle model (e.g., "camry", "f-150") | - |
 | `year` | Integer | No* | Model year (e.g., 2023, 2024) | - |
 | `results_wanted` | Integer | No | Maximum number of reviews to extract | 20 |
-| `max_pages` | Integer | No | Maximum pages to scrape (safety limit) | 10 |
 | `proxyConfiguration` | Object | No | Proxy settings for requests | Residential proxies |
 
-**Note:** Either provide `startUrl` OR the combination of `make`, `model`, and `year`.
+**Note:** Either provide `startUrl` OR the combination of `make`, `model`, and `year`. The scraper automatically calculates the required number of pages based on `results_wanted`.
 
 ## Output Format
 
@@ -186,17 +183,18 @@ This scraper is optimized for both speed and cost efficiency:
 
 ### Tips for Optimization
 
-1. **Set Realistic Limits**: Use `results_wanted` to control runtime and costs
+1. **Set Realistic Limits**: Use `results_wanted` to control runtime and costs (pages are auto-calculated)
 2. **Batch Processing**: For multiple vehicles, run separate scraper instances
 3. **Proxy Selection**: Residential proxies provide best success rates
-4. **Page Limits**: Set `max_pages` as a safety cap to prevent runaway scraping
 
 ## Pagination & Data Collection
 
-The scraper automatically handles pagination:
+The scraper automatically handles pagination with intelligent page calculation:
 
+- **Auto-calculates pages** based on `results_wanted` (assumes ~10 reviews per page + safety buffer)
 - Starts from page 1 of the review listing
-- Continues to subsequent pages until reaching `results_wanted` or `max_pages`
+- Continues to subsequent pages until reaching `results_wanted`
+- **Stops immediately** when target is reached (no wasted requests)
 - Intelligently detects when no more reviews are available
 - Deduplicates reviews to ensure unique results
 

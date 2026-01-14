@@ -46,13 +46,6 @@
       "prefill": 20,
       "editor": "number"
     },
-    "max_pages": {
-      "title": "Maximum number of pages (optional)",
-      "type": "integer",
-      "description": "Safety cap on pages to visit. Leave empty for auto-calculation based on results_wanted (approximately 10 reviews per page). Only set this if you want to override the automatic limit.",
-      "minimum": 1,
-      "editor": "number"
-    },
     "proxyConfiguration": {
       "title": "Proxy configuration",
       "type": "object",
